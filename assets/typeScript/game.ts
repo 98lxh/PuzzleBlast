@@ -103,7 +103,7 @@ export class game extends Component {
         this.numBlockType = 2 //随机关卡，下一关比该关卡多几个种类
         this.numBlocksKuaiGeShu = 99 //随机关卡，最少个块数 必须是3的倍数
         this.numBlocksKuai = 6 //随机关卡，下一关比该关卡多几个块 必须是3的倍数
-        this.arrNumDJ = [3,3,99,3]//每个道具的个数
+        this.arrNumDJ = [5,2,0,3]//每个道具的个数
         this.isEditing = this.parentEdit.active //是否是编辑模式
         this.numTypeEdit = 1//(0:减，1：加)
         this.numTypeSuiJi = 2 //随机模式下，用那种类型的坐标（0：随机的 1：规范的 2：有随机也有规范）
@@ -152,6 +152,7 @@ export class game extends Component {
 
 
     startGame(){
+        this.audioSource.playOneShot(this.arrAudio[0],1)
         this.startLayer.active = false;
         this.gameType = 0;
         this.refreshLevelInfo(true)
@@ -272,7 +273,12 @@ export class game extends Component {
         this.layerOver.active = false
         this.nodeTip.scale = new Vec3(0,0,0)
 
+        if(!this.isEditing && this.numLevel !== 2){
+            this.refreshLevelInfo()
+        }
+
         this.shuaXinDJ()
+
 
         if (this.isEditing) {
             let children = this.parentBlocks.children
@@ -287,9 +293,6 @@ export class game extends Component {
                 this.openAlert()
                 return
             }
-
-            this.refreshLevelInfo()
-
 
 
             let children = this.parentBlocks.children
@@ -344,8 +347,6 @@ export class game extends Component {
             .call(() => {
                 this.alertLayer.active = false
                 this.start()
-                // this.startLayer.active = true
-                // this.numLevel = 0
             })
             .start()
     }
@@ -373,8 +374,8 @@ export class game extends Component {
 
         if(this.numLevel !== 0 || isStart){
             tween(this.transiton)
-                .to(1.5, { position: new Vec3(-1000, 0, 0) })
-                .call(() => { this.transiton.position = new Vec3(1000, 0, 0) })
+                .to(1.2, { position: new Vec3(-800, 0, 0) })
+                .call(() => { this.transiton.position = new Vec3(800, 0, 0) })
                 .start()
         }
         
@@ -717,9 +718,6 @@ export class game extends Component {
             
             return
         }
-
-        // console.log(v2_touchStart)
-        // console.log(v3_touchStart)
         
         let children = this.parentBlocks.children
         for (let i = children.length-1; i >= 0; i--) {
@@ -749,7 +747,10 @@ export class game extends Component {
 
         if (this.isEditing ) {
             if (this.numTypeEdit == 1) {
-                let children = this.parentEdit.chidlren
+                let children = this.parentEdit.children
+
+
+
                 for (let i = children.length - 1; i >= 0; i--) {
                 
                     let node_UITransform = children[i].getComponent(UITransform)
@@ -775,7 +776,7 @@ export class game extends Component {
                     }
                 }
             }else if (this.numTypeEdit == 0) {
-                let children = this.parentBlocks.chidlren
+                let children = this.parentBlocks.children
                 for (let i = children.length-1; i >= 0; i--) {
                     let ts_block = children[i].getComponent(block)
                     let node_UITransform = children[i].getComponent(UITransform)
@@ -938,6 +939,7 @@ export class game extends Component {
             this.layerOver.active = false
             this.btn1()
         }else if (str == 'btn_cw') {
+            this.audioSource.playOneShot(this.arrAudio[0],1)
             this.numLevel = 0
             this.init()
         }else if (str == 'btn_yin') {
